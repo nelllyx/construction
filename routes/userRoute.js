@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {signup, otpVerification, login, createProject, getProjects} = require('../controller/userController');
-const {protect,restrictTo} = require("../services/authenticationService");
+const {protect,restrictTo} = require("../middleware/authMiddleware");
 
 
 // Public routes

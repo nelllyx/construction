@@ -1,4 +1,5 @@
 const userRepository = require('../repository/userRepository')
+const bidRepository = require('../repository/bidRepository')
 const AppError = require('../exceptions/AppError')
 const {generateUserOtp, otpVerification, signUpToken} = require('../services/authenticationService')
 
@@ -53,6 +54,20 @@ exports.getProject = async (projectId) => {
     if(!project) throw new AppError("No available project", 401)
 
     return project;
+
+}
+
+exports.createBid = async (projectId, contractorId, price, duration) => {
+
+    const [bid, created] = bidRepository.findOrCreateBid(projectId, contractorId, price, duration)
+
+    if(!created){
+        await bidRepository.updateBid(price, duration)
+
+        return `Bid updated. ${bid} `;
+    }
+
+
 
 }
 

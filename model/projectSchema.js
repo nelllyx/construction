@@ -15,7 +15,7 @@ const Project = sequelize.define('Project',{
     },
 
     description:{
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
 
@@ -26,6 +26,27 @@ const Project = sequelize.define('Project',{
 
 
 }, {timestamps: true})
+
+Project.associate = (models) => {
+    // A Project belongs to a Homeowner
+    Project.belongsTo(models.User, {
+        foreignKey: 'homeownerId',
+        as: 'homeowner',
+    });
+
+    // A Project can have many Bids (from Contractors)
+    Project.hasMany(models.Bid, {
+        foreignKey: 'projectId',
+        as: 'bids',
+    });
+
+    // A Project can have many Milestones
+    Project.hasMany(models.Milestone, {
+        foreignKey: 'projectId',
+        as: 'milestones',
+    });
+};
+
 
 
 module.exports = Project

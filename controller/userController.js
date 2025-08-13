@@ -4,7 +4,6 @@ const catchAsync = require('../middleware/catchAsync')
 const userRoles = require("../config/UserRoles");
 
 
-
 exports.signup = catchAsync( async (req, res, next) => {
 
     if(!req.body){
@@ -92,5 +91,21 @@ exports.createProject = catchAsync( async (req, res, next) => {
 })
 
 exports.getProject = catchAsync(async (req, res, next) => {
-    
+
+})
+
+exports.createBid = catchAsync(async (req, res, next) => {
+
+    if(!req.body){
+        return next(new AppError("Request body can not be empty", 400))
+    }
+
+    const {price, duration, location, } = req.body
+
+    if (!tittle || !description || !location) {
+        return next(new AppError('Every field is required', 400));
+    }
+
+
+
 })

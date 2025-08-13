@@ -31,6 +31,9 @@ class UserRepository {
 
         return await  User.findOne({where: {id: id}})
     }
+
+
+
 }
 
 module.exports = new UserRepository();

@@ -14,12 +14,24 @@ const User = sequelize.define('User', {
 
     firstName:{
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+
+        validate: {
+            notEmpty: {
+                msg: "First name cannot be empty"
+            }
+        }
     },
 
    lastName:{
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+
+       validate: {
+           notEmpty: {
+               msg: "Last name cannot be empty"
+           }
+       }
     },
 
     email: {
@@ -34,7 +46,13 @@ const User = sequelize.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        minLength: 8
+        minLength: 8,
+
+        validate: {
+            notEmpty: {
+                msg: "Password cannot be empty"
+            }
+        }
     },
 
     phone: {
@@ -51,7 +69,13 @@ const User = sequelize.define('User', {
     gender:{
         type: DataTypes.STRING,
         enum: ['male', 'female'],
-        allowNull: false
+        allowNull: false,
+
+        validate: {
+            notEmpty: {
+                msg: "Gender cannot be empty"
+            }
+        }
     },
 
     role: {
@@ -105,6 +129,22 @@ const User = sequelize.define('User', {
 
 })
 
+
+User.associate = (models) => {
+    User.hasMany(models.Project, {
+        foreignKey: 'homeownerId',
+        as: 'projects',
+        scope: { role: userRoles.HOMEOWNER }
+    });
+
+    User.hasMany(models.Bid, {
+        foreignKey: 'contractorId',
+        as: 'bids',
+        scope: { role: userRoles.CONTRACTOR }
+    });
+};
+
+
 User.prototype.correctPassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
@@ -115,5 +155,7 @@ User.prototype.toJSON = function() {
     delete values.otp;
     return values;
 };
+
+
 
 module.exports = User
