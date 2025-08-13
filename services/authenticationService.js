@@ -1,0 +1,193 @@
+const AppError = require("../exceptions/AppError");
+const catchAsync = require("../middleware/catchAsync")
+const jwt = require('jsonwebtoken')
+const crypto = require("crypto");
+const userRoles = require("../config/UserRoles");
+const userRepository = require('../repository/userRepository')
+
+
+exports.signUpToken = (id, role) => {
+
+    if (!id || !role) {
+        throw new AppError('Invalid token data', 400);
+    }
+
+    if (!Object.values(userRoles).includes(role)) {
+        throw new AppError('Invalid role for token', 400);
+    }
+
+    return jwt.sign(
+        {
+            id: id.toString(),
+            role: role
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: process.env.JWT_EXPIRES_IN
+        }
+    );
+}
+
+exports.generateUserOtp = catchAsync (async  (Model) => {
+
+    const otpCreatedAt = Date.now()
+
+    const uniqueDigits = new Set();
+
+    while (uniqueDigits.size < 6) {
+        // Generate a random byte and take its value modulo 10
+        const randomByte = crypto.randomBytes(1)[0];
+        const digit = randomByte % 10;
+        uniqueDigits.add(digit);
+    }
+
+    Model.otp = Array.from(uniqueDigits).join('')
+    Model.otpCreationTime = otpCreatedAt
+
+    await Model.save()
+
+    return true
+
+})
+
+exports.sendOtpToUserEmail = (email, otp, name) =>{
+
+    const expiryTime = '15 minutes';
+    const appName = 'Anonymous Therapy';
+    const supportEmail = 'support@example.com';
+
+    const { html, text } = generateOtpEmail(
+        name,
+        otp,
+        expiryTime,
+        appName,
+        supportEmail
+    );
+
+
+    return {
+        from: process.env.SENDER_EMAIL,
+        to: email,
+        subject: `🔑 Your OTP for ${appName} – Expires in ${expiryTime}!`,
+        html: html
+
+    }
+
+}
+
+exports.otpVerification = async (userId, otp) => {
+
+    const currentTime = Date.now();
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError('User not found', 404);
+    }
+
+    if (!user.otp || !user.otpCreationTime) {
+        throw new AppError('OTP not generated or already used.', 404);
+    }
+
+    const timeDifference = currentTime - user.otpCreationTime.getTime();
+    const fifteenMinutes = 15 * 60 * 1000;
+
+    if (timeDifference > fifteenMinutes) {
+        user.otp = null;
+        user.otpCreationTime = null;
+        await user.save();
+        throw new AppError('OTP has expired. Please request for a new one.', 400);
+    }
+
+    const realOtp = user.otp;
+    if (realOtp !== otp) {
+        throw new AppError("Invalid OTP", 400);
+    }
+
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpCreationTime = undefined;
+    await user.save();
+
+    // Ensure we have both id and role before generating token
+    if (!user._id || !user.role) {
+        throw new AppError('Invalid user data for token generation', 500);
+    }
+
+    // Log the values being passed to signUpToken for debugging
+    // console.log('Token generation data:', {
+    //     id: user._id.toString(),
+    //     role: user.role
+    // });
+
+    return exports.signUpToken(user._id, user.role);
+}
+
+exports.getUserByIdAndRole = async (id, role) => {
+
+    let user;
+
+    // Validate role
+    if (!role || !Object.values(userRoles).includes(role)) {
+        throw new AppError('Invalid user role', 400);
+    }
+
+    switch (role) {
+        case userRoles.CLIENT:
+            user = await Client.findById(id);
+            break;
+        case userRoles.THERAPIST:
+            user = await Therapist.findById(id);
+            break;
+        default:
+            throw new AppError('Invalid user role', 400);
+    }
+
+    if (!user) {
+        throw new AppError('User not found', 404);
+    }
+    return user;
+}
+
+exports.protect = catchAsync(async (req, res, next) => {
+
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) {
+        throw new AppError('Please login to gain access', 401);
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (!decoded.id || !decoded.role) {
+            new AppError('Invalid token format', 401);
+        }
+
+        req.user = await exports.getUserByIdAndRole(decoded.id, decoded.role);
+        next();
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            throw new AppError('Invalid token. Please login again', 401);
+        }
+        if (error.name === 'TokenExpiredError') {
+            throw new AppError('Your token has expired. Please login again', 401);
+        }
+        throw error;
+    }
+});
+
+exports.restrictTo = (...roles)=>{
+    return(req, res, next)=>{
+        if(!roles.includes(req.user.role)){
+            throw new AppError('You do not have permission to perform this action', 403)
+        }
+
+
+
+        next()
+    }
+
+}
