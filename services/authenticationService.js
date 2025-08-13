@@ -104,12 +104,12 @@ exports.otpVerification = async (userId, otp) => {
     }
 
     user.isVerified = true;
-    user.otp = undefined;
-    user.otpCreationTime = undefined;
+    user.otp = null;
+    user.otpCreationTime = null;
     await user.save();
 
     // Ensure we have both id and role before generating token
-    if (!user._id || !user.role) {
+    if (!user.id || !user.role) {
         throw new AppError('Invalid user data for token generation', 500);
     }
 
@@ -119,7 +119,7 @@ exports.otpVerification = async (userId, otp) => {
     //     role: user.role
     // });
 
-    return exports.signUpToken(user._id, user.role);
+    return exports.signUpToken(user.id, user.role);
 }
 
 exports.getUserByIdAndRole = async (id, role) => {
@@ -131,16 +131,7 @@ exports.getUserByIdAndRole = async (id, role) => {
         throw new AppError('Invalid user role', 400);
     }
 
-    switch (role) {
-        case userRoles.CLIENT:
-            user = await Client.findById(id);
-            break;
-        case userRoles.THERAPIST:
-            user = await Therapist.findById(id);
-            break;
-        default:
-            throw new AppError('Invalid user role', 400);
-    }
+  user = userRepository.findUserByIdAndRole(id,role)
 
     if (!user) {
         throw new AppError('User not found', 404);
@@ -191,3 +182,5 @@ exports.restrictTo = (...roles)=>{
     }
 
 }
+
+

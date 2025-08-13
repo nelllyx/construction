@@ -20,6 +20,17 @@ class UserRepository {
         return await User.findByPk(id);
 
     }
+
+    async findUserByIdAndRole (id, role) {
+
+        return await  User.findOne({where: {id: id, role:role}})
+    }
+
+
+    async findProjectById(id){
+
+        return await  User.findOne({where: {id: id}})
+    }
 }
 
 module.exports = new UserRepository();
