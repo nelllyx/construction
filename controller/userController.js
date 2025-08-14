@@ -1,4 +1,4 @@
-const {createUser,verifyUserOtp, login, createProject} = require('../services/userService')
+const {createUser,verifyUserOtp, login, createProject,getProject,createBid} = require('../services/userService')
 const AppError = require('../exceptions/AppError')
 const catchAsync = require('../middleware/catchAsync')
 const userRoles = require("../config/UserRoles");
@@ -70,21 +70,24 @@ exports.login = catchAsync(async (req, res, next) =>{
 
 exports.createProject = catchAsync( async (req, res, next) => {
 
+
+    const userId = req.user.id
+
     if(!req.body){
         return next(new AppError("Request body can not be empty", 400))
     }
 
-    const {tittle, description, location, } = req.body
+    const {title, description, location } = req.body
 
-    if (!tittle || !description || !location) {
+    if (!title || !description || !location) {
         return next(new AppError('Every field is required', 400));
     }
 
-    const project = await createProject(req.body)
+    const project = await createProject({homeownerId:userId , title, description, location})
 
     res.status(201).json({
         message: 'Project created successfully',
-        project
+        data: project
     })
 
 
@@ -92,20 +95,45 @@ exports.createProject = catchAsync( async (req, res, next) => {
 
 exports.getProject = catchAsync(async (req, res, next) => {
 
+    const projectId = req.params.id;
+
+    const Project = await getProject(projectId)
+
+    if (!Project) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Project not found'
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data:  Project
+    });
+
 })
 
 exports.createBid = catchAsync(async (req, res, next) => {
+
+    const contractorId = req.user.id
+
 
     if(!req.body){
         return next(new AppError("Request body can not be empty", 400))
     }
 
-    const {price, duration, location, } = req.body
+    const {projectId,price, duration} = req.body
 
-    if (!tittle || !description || !location) {
+    if (!price || !duration) {
         return next(new AppError('Every field is required', 400));
     }
 
+    const Bid = await createBid(projectId,contractorId,price,duration)
 
+
+    res.status(201).json({
+        message: 'Bid created',
+        data: Bid
+    })
 
 })

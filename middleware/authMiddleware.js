@@ -1,7 +1,7 @@
 const catchAsync = require("./catchAsync");
 const AppError = require("../exceptions/AppError");
 const jwt = require("jsonwebtoken");
-
+const auth = require("../services/authenticationService")
 
 exports.protect = catchAsync(async (req, res, next) => {
 
@@ -21,7 +21,7 @@ exports.protect = catchAsync(async (req, res, next) => {
             new AppError('Invalid token format', 401);
         }
 
-        req.user = await exports.getUserByIdAndRole(decoded.id, decoded.role);
+        req.user = await auth.getUserByIdAndRole(decoded.id, decoded.role);
         next();
     } catch (error) {
         if (error.name === 'JsonWebTokenError') {

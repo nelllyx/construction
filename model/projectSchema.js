@@ -9,7 +9,7 @@ const Project = sequelize.define('Project',{
         autoIncrement: true,
     },
 
-    tittle:{
+    title:{
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -24,6 +24,16 @@ const Project = sequelize.define('Project',{
         allowNull: false
     },
 
+    homeownerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Users',
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    },
 
 }, {timestamps: true})
 

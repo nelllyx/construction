@@ -97,7 +97,7 @@ const User = sequelize.define('User', {
     otpCreationTime:{
         type: DataTypes.DATE,
         allowNull: true,
-        default: null
+        defaultValue: null
     },
 
     passwordChangedAt: {
@@ -133,14 +133,12 @@ const User = sequelize.define('User', {
 User.associate = (models) => {
     User.hasMany(models.Project, {
         foreignKey: 'homeownerId',
-        as: 'projects',
-        scope: { role: userRoles.HOMEOWNER }
+        as: 'projects'
     });
 
     User.hasMany(models.Bid, {
         foreignKey: 'contractorId',
-        as: 'bids',
-        scope: { role: userRoles.CONTRACTOR }
+        as: 'bids'
     });
 };
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {signup, otpVerification, login, createProject, getProjects} = require('../controller/userController');
+const {signup, otpVerification, login, createProject, getProject, createBid} = require('../controller/userController');
 const {protect,restrictTo} = require("../middleware/authMiddleware");
 
 
@@ -10,10 +10,9 @@ router.post('/verification', otpVerification)
 router.post('/login', login)
 
 
-// homeowner Protected Route
-
-router.use(protect, restrictTo('homeOwner'));
-router.post('/projects', createProject)
-router.get('/projects/:id', getProjects)
-
+//Protected Routes
+router.use(protect);
+router.post('/projects', restrictTo('house_owner'),createProject)
+router.get('/projects/:id', getProject)
+router.post('/bids', restrictTo('contractor') ,createBid)
 module.exports = router;

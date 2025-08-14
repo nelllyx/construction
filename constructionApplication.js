@@ -2,9 +2,9 @@ const dotenv = require("dotenv");
 const express = require('express')
 const sequelize = require('./config/database')
 const cors = require('cors');
-const AppError = require("./exceptions/AppError");
 const catchAsync = require("./middleware/catchAsync")
 const User = require("./model/userSchema")
+const Model = require("./model")
 const userRoutes = require('./routes/userRoute')
 
 

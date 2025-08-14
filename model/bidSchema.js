@@ -19,9 +19,31 @@ const Bid = sequelize.define('Bid',{
         allowNull: false
     },
 
-    location:{
-        type: DataTypes.STRING,
-        allowNull: false
+    status: {
+        type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+        defaultValue: 'pending',
+    },
+    
+    projectId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Projects',
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    },
+
+    contractorId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Users',
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
     },
 
 

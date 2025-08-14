@@ -2,7 +2,7 @@ const userRepository = require('../repository/userRepository')
 const bidRepository = require('../repository/bidRepository')
 const AppError = require('../exceptions/AppError')
 const {generateUserOtp, otpVerification, signUpToken} = require('../services/authenticationService')
-
+const projectRepository = require('../repository/projectRepository')
 
 exports.createUser = async (userData) => {
 
@@ -43,15 +43,15 @@ exports.login = async (email, password) => {
 
 exports.createProject = async (projectData)=>{
 
-    return  await userRepository.create(projectData)
+    return  await projectRepository.create(projectData)
 
 }
 
 exports.getProject = async (projectId) => {
 
-    const project = await userRepository.findProjectById(projectId)
+    const project = await projectRepository.findProjectById(projectId)
 
-    if(!project) throw new AppError("No available project", 401)
+    if(!project) throw new AppError("Project not found", 401)
 
     return project;
 
@@ -59,14 +59,7 @@ exports.getProject = async (projectId) => {
 
 exports.createBid = async (projectId, contractorId, price, duration) => {
 
-    const [bid, created] = bidRepository.findOrCreateBid(projectId, contractorId, price, duration)
-
-    if(!created){
-        await bidRepository.updateBid(price, duration)
-
-        return `Bid updated. ${bid} `;
-    }
-
+  return   bidRepository.findOrCreateBid(projectId, contractorId, price, duration)
 
 
 }
