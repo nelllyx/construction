@@ -29,7 +29,7 @@ Contractors (Users with contractor role)
 - **Bid**: Contractor proposals for projects
 - **Milestone**: Project progress tracking
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js (v14 or higher)
@@ -79,7 +79,7 @@ Contractors (Users with contractor role)
 
    The API will be available at `http://localhost:3000`
 
-## 🧪 Testing Endpoints
+## Testing Endpoints
 
 ### Authentication Endpoints
 
@@ -308,7 +308,7 @@ http://localhost:3000/api/user
 }
 ```
 
-## 🔧 Development
+## Development
 
 ### Available Scripts
 ```bash
@@ -333,7 +333,7 @@ construction/
 └── constructionApplication.js  # Main application file
 ```
 
-## 🧪 Testing
+##  Testing
 
 ### Manual Testing
 Use the provided curl commands or import the Postman collection.
