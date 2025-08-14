@@ -1,14 +1,17 @@
 {
   "name": "construction",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "constructionApplication.js",
   "scripts": {
-    "start": "constructionApplication.js"
+    "start": "node constructionApplication.js",
+    "dev": "nodemon constructionApplication.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linter specified\" && exit 0"
   },
-  "keywords": [],
+  "keywords": ["construction", "api", "nodejs", "express", "sequelize", "postgresql"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Construction Management API with user management, project tracking, and bidding system",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -17,5 +20,11 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
