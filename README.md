@@ -346,16 +346,16 @@ npm test
 
 ##  Environment Variables
 
-| Variable | Description              | Default |
-|----------|--------------------------|---------|
-| `DATABASE_NAME` | PostgreSQL database name | - |
-| `DATABASE_USER` | Database username        | - |
-| `DATABASE_PASSWORD` | Database password        | - |
-| `DATABASE_HOST` | Database host            | localhost |
-| `DATABASE_PORT` | Database port            | 5432 |
-| `PORT` | Application port         | 3001 |
-| `JWT_SECRET` | JWT signing secret       | - |
-| `JWT_EXPIRES_IN` | JWT secret expiration    | - |
+| Variable | Description              | Default     |
+|----------|--------------------------|-------------|
+| `DATABASE_NAME` | PostgreSQL database name | -           |
+| `DATABASE_USER` | Database username        | -           |
+| `DATABASE_PASSWORD` | Database password        | -           |
+| `DATABASE_HOST` | Database host            | localhost   |
+| `DATABASE_PORT` | Database port            | 5432        |
+| `PORT` | Application port         | 3000        |
+| `JWT_SECRET` | JWT signing secret       | -           |
+| `JWT_EXPIRES_IN` | JWT secret expiration    | -           |
 | `NODE_ENV` | Environment mode         | development |
 
 
