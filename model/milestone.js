@@ -23,11 +23,6 @@ const Milestone = sequelize.define('Milestone', {
 		allowNull: true
 	},
 
-	completedAt: {
-		type: DataTypes.DATE,
-		allowNull: true
-	},
-
 	status: {
 		type: DataTypes.ENUM('pending', 'in_progress', 'completed', 'released'),
 		defaultValue: 'pending'

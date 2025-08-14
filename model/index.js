@@ -11,12 +11,7 @@ const models = {
     Milestone,
 };
 
-// Set up associations
-Object.values(models).forEach(model => {
-    if (model.associate) {
-        model.associate(models);
-    }
-});
+
 
 module.exports = {
     sequelize,

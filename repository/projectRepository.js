@@ -8,7 +8,6 @@ class ProjectRepository {
         return Project.create(userData);
     }
 
-
     async findProjectById(projectId){
         return await Project.findByPk(projectId, {
             include: [
@@ -33,6 +32,9 @@ class ProjectRepository {
 
     }
 
+    async getProjectByHomeownerIdAndName(homeownerId, title){
+        return await Project.findOne({where: { homeownerId, title }})
+    }
 
 }
 

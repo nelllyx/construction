@@ -51,28 +51,16 @@ exports.generateUserOtp = catchAsync (async  (Model) => {
 })
 
 exports.sendOtpToUserEmail = (email, otp, name) =>{
-
-    const expiryTime = '15 minutes';
-    const appName = 'Anonymous Therapy';
-    const supportEmail = 'support@example.com';
-
-    const { html, text } = generateOtpEmail(
-        name,
-        otp,
-        expiryTime,
-        appName,
-        supportEmail
-    );
-
-
+    // Email functionality temporarily disabled
+    // TODO: Implement email service
+    console.log(`OTP for ${name} (${email}): ${otp}`);
+    
     return {
         from: process.env.SENDER_EMAIL,
         to: email,
-        subject: `🔑 Your OTP for ${appName} – Expires in ${expiryTime}!`,
-        html: html
-
+        subject: `🔑 Your OTP for Construction API – Expires in 15 minutes!`,
+        html: `<p>Your OTP is: <strong>${otp}</strong></p>`
     }
-
 }
 
 exports.otpVerification = async (userId, otp) => {
@@ -131,7 +119,7 @@ exports.getUserByIdAndRole = async (id, role) => {
         throw new AppError('Invalid user role', 400);
     }
 
-  user = userRepository.findUserByIdAndRole(id,role)
+  user = await userRepository.findUserByIdAndRole(id,role)
 
     if (!user) {
         throw new AppError('User not found', 404);

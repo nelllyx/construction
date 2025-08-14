@@ -2,7 +2,7 @@
 
 A RESTful API for managing construction projects, bids, and milestones built with Node.js, Express, and PostgreSQL using Sequelize ORM.
 
-## 🏗️ Project Overview
+##  Project Overview
 
 This API enables:
 - **User Management**: Registration, authentication, and role-based access (Contractors, House Owners, Project Owners)
@@ -10,23 +10,24 @@ This API enables:
 - **Bidding System**: Contractors can bid on projects
 - **Milestone Tracking**: Track project progress and payments
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Entity Relationship Diagram
 
 ```
-Users (1) ←→ (N) Projects
-  ↓                    ↓
-Bids (N) ←→ (1)  Milestones (N)
-  ↓
+Users (Homeowners) (1) ←→ (N) Projects
+   ↓                        ↓
+Bids (N) ←→ (1) Milestones (N)
+   ↓
 Contractors (Users with contractor role)
+
 ```
 
 ### Models
 - **User**: Authentication, roles, verification
 - **Project**: Construction project details with homeowner association
 - **Bid**: Contractor proposals for projects
-- **Milestone**: Project progress tracking and payments
+- **Milestone**: Project progress tracking
 
 ## 🚀 Quick Start
 
@@ -62,6 +63,7 @@ Contractors (Users with contractor role)
    DATABASE_PORT=5432
    PORT=3001
    JWT_SECRET=your_jwt_secret
+   JWT_EXPIRES_IN=your_preferred_time
    ```
 
 4. **Database Setup**
@@ -75,7 +77,7 @@ Contractors (Users with contractor role)
    npm start
    ```
 
-   The API will be available at `http://localhost:3001`
+   The API will be available at `http://localhost:3000`
 
 ## 🧪 Testing Endpoints
 
@@ -150,7 +152,26 @@ curl -X POST http://localhost:3001/api/user/bid \
   }'
 ```
 
-## 🐳 Docker Setup
+#### 7. Create Milestone for a Project (Requires Authentication)
+```bash
+curl -X POST http://localhost:3001/api/user/project/milestone \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "projectId": "PROJECT_ID",
+    "title": "Terrace Kulture",
+    "description": "Flooring and screeding of the apartment done",
+    "status": "completed"
+    "dueDate": ""
+  }'
+```
+#### 8. Get Project Milestones
+```bash
+curl -X GET http://localhost:3001/api/user/milestone/PROJECT_ID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+##  Docker Setup
 
 ### Dockerfile
 ```dockerfile
@@ -215,7 +236,7 @@ docker-compose up -d
 docker-compose down
 ```
 
-## ☁️ AWS Elastic Beanstalk Deployment
+## AWS Elastic Beanstalk Deployment
 
 ### 1. Prepare Application
 ```bash
@@ -251,29 +272,31 @@ Set these in your EB environment:
 eb deploy
 ```
 
-## 📊 API Documentation
+## API Documentation
 
 ### Base URL
 ```
-http://localhost:3001/api/user
+http://localhost:3000/api/user
 ```
 
 ### Endpoints Summary
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/signup` | User registration | No |
-| POST | `/verify-otp` | Email verification | No |
-| POST | `/login` | User authentication | No |
-| POST | `/project` | Create project | Yes |
-| GET | `/project/:id` | Get project with bids | Yes |
-| POST | `/bid` | Create bid | Yes |
+| Method | Endpoint                 | Description                | Auth Required |
+|--------|--------------------------|----------------------------|---------------|
+| POST | `/signup`                | User registration          | No |
+| POST | `/verify-otp`            | Email verification         | No |
+| POST | `/login`                 | User authentication        | No |
+| POST | `/project`               | Create project             | Yes |
+| GET | `/project/:id`           | Get project with bids      | Yes |
+| POST | `/bid`                   | Create bid                 | Yes |
+| POST | `/project/milestone`     | Create project milestone   | Yes |
+| GET | `/milestones/:projectId` | Get project with milestone | Yes |
+
 
 ### Response Format
 ```json
 {
   "status": "success",
-  "data": {},
-  "message": "Operation successful"
+  "data": {}
 }
 ```
 
@@ -306,6 +329,7 @@ construction/
 ├── repository/      # Data access layer
 ├── routes/          # API route definitions
 ├── services/        # Business logic
+|── validators/        # validation inputs
 └── constructionApplication.js  # Main application file
 ```
 
@@ -320,38 +344,18 @@ Use the provided curl commands or import the Postman collection.
 npm test
 ```
 
-## 📝 Environment Variables
+##  Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable | Description              | Default |
+|----------|--------------------------|---------|
 | `DATABASE_NAME` | PostgreSQL database name | - |
-| `DATABASE_USER` | Database username | - |
-| `DATABASE_PASSWORD` | Database password | - |
-| `DATABASE_HOST` | Database host | localhost |
-| `DATABASE_PORT` | Database port | 5432 |
-| `PORT` | Application port | 3001 |
-| `JWT_SECRET` | JWT signing secret | - |
-| `NODE_ENV` | Environment mode | development |
+| `DATABASE_USER` | Database username        | - |
+| `DATABASE_PASSWORD` | Database password        | - |
+| `DATABASE_HOST` | Database host            | localhost |
+| `DATABASE_PORT` | Database port            | 5432 |
+| `PORT` | Application port         | 3001 |
+| `JWT_SECRET` | JWT signing secret       | - |
+| `JWT_EXPIRES_IN` | JWT secret expiration    | - |
+| `NODE_ENV` | Environment mode         | development |
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the GitHub repository
-- Contact the development team
-- Check the API documentation
-
----
-
-**Built with ❤️ using Node.js, Express, and PostgreSQL**

@@ -3,6 +3,10 @@ const bidRepository = require('../repository/bidRepository')
 const AppError = require('../exceptions/AppError')
 const {generateUserOtp, otpVerification, signUpToken} = require('../services/authenticationService')
 const projectRepository = require('../repository/projectRepository')
+const milestoneRepository = require('../repository/milestoneRepository')
+const Project = require("../model/projectSchema")
+
+
 
 exports.createUser = async (userData) => {
 
@@ -30,20 +34,17 @@ exports.login = async (email, password) => {
 
     if(!user || ( ! await user.correctPassword(password))) return (new AppError('Invalid login credentials', 400));
 
-
-    // Check if user is verified
     if (!user.isVerified) {
         return (new AppError('Please complete your email verification', 401));
     }
 
-    // Generate token
     return signUpToken(user.id, user.role);
 
 }
 
 exports.createProject = async (projectData)=>{
 
-    return  await projectRepository.create(projectData)
+   return  await projectRepository.create(projectData)
 
 }
 
@@ -59,9 +60,26 @@ exports.getProject = async (projectId) => {
 
 exports.createBid = async (projectId, contractorId, price, duration) => {
 
-  return   bidRepository.findOrCreateBid(projectId, contractorId, price, duration)
+  return  await bidRepository.findOrCreateBid(projectId, contractorId, price, duration)
 
 
 }
 
+exports.createMilestone = async (milestoneData) => {
 
+    const project = await Project.findByPk(milestoneData.projectId);
+    if (!project) throw new AppError('Project not found')
+
+    return await milestoneRepository.createProjectMilestone(milestoneData)
+
+}
+
+exports.getProjectMilestone = async (projectId)=>{
+
+    const milestone = milestoneRepository.findProjectMilestone(projectId)
+
+    if(!milestone) throw new AppError("No mile stone found for this project", 401)
+
+    return milestone;
+
+}

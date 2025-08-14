@@ -3,21 +3,32 @@ const express = require('express')
 const sequelize = require('./config/database')
 const cors = require('cors');
 const catchAsync = require("./middleware/catchAsync")
-const User = require("./model/userSchema")
-const Model = require("./model")
 const userRoutes = require('./routes/userRoute')
+const AppError = require("./exceptions/AppError");
+
+// Initialize models and associations
+const models = require('./model');
+
+Object.values(models).forEach(model => {
+    if (model.associate) {
+        model.associate(models);
+    }
+});
+
 
 
 const dotenvConfig = dotenv.config({ path: './config.env' });
+
+if (dotenvConfig.error) {
+    console.warn('⚠️ Could not load .env file:', dotenvConfig.error);
+}
 
 const constructionApplication = express()
 
 constructionApplication.use(express.json())
 constructionApplication.use(cors())
 
-if (dotenvConfig.error) {
-    console.warn('⚠️ Could not load .env file:', dotenvConfig.error);
-}
+
 
 sequelize.sync({ force: false , alter: true})
     .then(() => console.log('Models synced with PostgreSQL!'))
@@ -41,12 +52,10 @@ constructionApplication.get('/test-db', catchAsync(
     }))
 
 
-const port = process.env.PORT || 3001
-
-
-// constructionApplication.all('*', (req, res, next) => {
-//     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
-// });
+// 404 handler for unmatched routes
+constructionApplication.use((req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
 
 
 // Global error handling middleware
@@ -89,6 +98,7 @@ constructionApplication.use((err, req, res, next) => {
 
 
 // Start server
+const port = process.env.PORT || 3001
 constructionApplication.listen(port, () => {
     console.log(`App running on port ${port}...`)
 })

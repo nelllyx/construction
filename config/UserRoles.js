@@ -1,7 +1,7 @@
 const userRoles = {
     CONTRACTOR: 'contractor',
     HOUSE_OWNER: 'house_owner',
-    PROJECT_OWNER: 'project_owner',
+    PROJECT_MANAGER: 'project_manager',
 
 }
 

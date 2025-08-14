@@ -1,4 +1,4 @@
-const {createUser,verifyUserOtp, login, createProject,getProject,createBid} = require('../services/userService')
+const {createUser,verifyUserOtp, login, createProject,getProject,createBid,createMilestone, getProjectMilestone} = require('../services/userService')
 const AppError = require('../exceptions/AppError')
 const catchAsync = require('../middleware/catchAsync')
 const userRoles = require("../config/UserRoles");
@@ -70,7 +70,6 @@ exports.login = catchAsync(async (req, res, next) =>{
 
 exports.createProject = catchAsync( async (req, res, next) => {
 
-
     const userId = req.user.id
 
     if(!req.body){
@@ -79,8 +78,8 @@ exports.createProject = catchAsync( async (req, res, next) => {
 
     const {title, description, location } = req.body
 
-    if (!title || !description || !location) {
-        return next(new AppError('Every field is required', 400));
+    if (!title || !location) {
+        return next(new AppError('Title and location field required', 400));
     }
 
     const project = await createProject({homeownerId:userId , title, description, location})
@@ -117,7 +116,6 @@ exports.createBid = catchAsync(async (req, res, next) => {
 
     const contractorId = req.user.id
 
-
     if(!req.body){
         return next(new AppError("Request body can not be empty", 400))
     }
@@ -135,5 +133,44 @@ exports.createBid = catchAsync(async (req, res, next) => {
         message: 'Bid created',
         data: Bid
     })
+
+})
+
+exports.createProjectMilestone = catchAsync(async (req, res, next) => {
+
+    if(!req.body){
+        return next(new AppError("Request body can not be empty", 400))
+    }
+
+    const {projectId, title,description,dueDate,status} = req.body
+
+    const Milestone = await createMilestone({projectId, title, description, dueDate, status});
+
+    res.status(201).json({
+        message: 'Milestone created',
+        data: Milestone
+    })
+
+})
+
+exports.getProjectMilestone = catchAsync( async (req, res, next) => {
+
+    const projectId = req.params.projectId;
+
+    console.log(projectId)
+
+    const ProjectMilestone = await getProjectMilestone(projectId)
+
+    if (!ProjectMilestone) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Project milestone not found'
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data:  ProjectMilestone
+    });
 
 })

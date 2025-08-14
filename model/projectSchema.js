@@ -1,5 +1,6 @@
 const {DataTypes}  = require('sequelize')
 const sequelize = require('../config/database')
+const AppError = require("../exceptions/AppError");
 
 const Project = sequelize.define('Project',{
 
@@ -35,7 +36,21 @@ const Project = sequelize.define('Project',{
         onDelete: 'CASCADE',
     },
 
-}, {timestamps: true})
+}, { timestamps: true,
+    hooks: {
+        beforeCreate: (async (project, options) => {
+            const existingProject = await Project.findOne({
+                where: {
+                    homeownerId: project.homeownerId,
+                    title: project.title
+                }
+            });
+            if (existingProject) throw new AppError('A project with this name already exists for this homeowner.', 400);
+
+        })
+
+    }
+})
 
 Project.associate = (models) => {
     // A Project belongs to a Homeowner

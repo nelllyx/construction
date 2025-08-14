@@ -15,10 +15,11 @@ const sequelize = new Sequelize ({
     dialect: "postgres",
 })
 
-catchAsync( async ()=>{
-    await sequelize.authenticate()
-    console.log('PostgreSQL connection established successfully.');
-})
+// Test connection when needed, not on module load
+// catchAsync( async ()=>{
+//     await sequelize.authenticate()
+//     console.log('PostgreSQL connection established successfully.');
+// })
 
 
 module.exports = sequelize
